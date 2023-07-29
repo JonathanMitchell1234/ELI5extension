@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Extension Popup</title>
+    <style type="text/css">
+        /* Your CSS styles here */
+        #mainPopup {
+            padding: 10px;
+            height: 200px;
+            width: 400px;
+            font-family: Helvetica, Ubuntu, Arial, sans-serif;
+        }
+        h1 {
+            font-size: 2em;
+        }
+    </style>
+</head>
+<body>
+    <div id="mainPopup">
+        <h1>Hello extensionizr!</h1>
+        <p>To shut this popup down, edit the manifest file and remove the "default popup" key. To edit it, just edit ext/browser_action/browser_action.html. The CSS is there, too.</p>
+        <p id="accessTokenDisplay"></p> <!-- Add a paragraph to display the access token -->
+    </div>
+
+    <script>
+      // Function to send a message to the background script
+      function sendMessageToBackground(message) {
+        chrome.runtime.sendMessage(message);
+      }
+
+      // Function to update the popup with the access token
+      function updatePopupWithToken(token) {
+        const accessTokenDisplay = document.getElementById('accessTokenDisplay');
+        if (token) {
+          accessTokenDisplay.textContent = 'Access Token: ' + token;
+        } else {
+          accessTokenDisplay.textContent = 'Access Token not found.';
+        }
+      }
+
+      // Send a message to the background script to get the access token
+      sendMessageToBackground({ action: 'getAccessToken' });
+
+      // Listen for messages from the background script
+      chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message.action === 'accessTokenResponse') {
+          const accessToken = message.accessToken;
+          updatePopupWithToken(accessToken);
+        }
+      });
+    </script>
+</body>
+</html>
